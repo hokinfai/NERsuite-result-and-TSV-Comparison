@@ -46,18 +46,11 @@ public class Comparison {
 	}
 
 	public void start() throws IOException {
-		// System.out.println(test.size());
-		// System.out.println("countTest" + countTest);
-		// System.out.println(result.size());
-		// System.out.println("countResult" + countResult);
-
 		if (countTest < test.size() && countResult < result.size()) {
 			checking = 0;
 			String input = test.get(countTest);
-
 			String insert = result.get(countResult);
 			compare(input, insert);
-
 		}
 	}
 
@@ -67,70 +60,58 @@ public class Comparison {
 		String[] spilter = tester.split("\t");
 		String temName = "B-" + spilter[3].toUpperCase();
 		String[] segmenter = comparer.split("\t");
-
 		spilter[2] = spilter[2].replaceAll("\\s+", " ");
-
 		spilter[2] = spilter[2].replaceAll("－ ", "－");
+		// Compare the beginning number
 		if (spilter[0].equals(segmenter[0])) {
-			// System.out.println("hello");
+			// Compare the ending number
 			if (spilter[1].equals(segmenter[1])) {
-				// System.out.println(countResult);
-				// System.out.println(spilter[1]);
-
+				// Compare the terms
 				if (spilter[2].equals(segmenter[2])) {
-					// System.out.println("alan");
 					System.out.print("Test file is : " + spilter[3].toUpperCase());
 					System.out.print(";\tResult file is : " + segmenter[3].toUpperCase());
+					// Compare the annotation
 					if (temName.equals(segmenter[3].toUpperCase())) {
 						System.out.println(";\tTherefore, They match: " + segmenter[2]);
 					} else {
 						System.out.println(";\tTherefore, They do not match each other: " + segmenter[2]);
 					}
-
 					countTest++;
 					countResult++;
-
 					start();
 
 				} else {
+					// compare the terms
 					countTest++;
 					countResult++;
 					System.out.println(countResult + "Citation can not be detected!");
 					start();
 				}
 			} else {
+				// compare the ending of the term
 				String addUp = "";
 				String[] temResult = new String[4];
 				temResult[0] = spilter[0];
 				countResult++;
-				String s2 = result.get(countResult);
-				String[] tem = s2.split("\t");
-				temResult[1] = tem[1];
-				// System.out.println(tem[2]);
-				// System.out.println(temResult[2]);
-				// System.out.println(tem[2]);
-
-				if (tem[2].matches(".*\\p{Punct}")) {
-					tem[2] = tem[2];
-					tem[3] = segmenter[3];
-					// System.out.println(tem[2]);
+				String newSen = result.get(countResult);
+				String[] newStr = newSen.split("\t");
+				temResult[1] = newStr[1];
+				if (newStr[2].matches(".*\\p{Punct}")) {
+					newStr[2] = newStr[2];
+					newStr[3] = segmenter[3];
 				} else {
-					tem[2] = " " + tem[2];
+					newStr[2] = " " + newStr[2];
 				}
 
-				temResult[2] = segmenter[2] + tem[2];
+				temResult[2] = segmenter[2] + newStr[2];
 				temResult[2] = temResult[2].replaceAll("- ", "-");
-				temResult[2] = temResult[2].replaceAll("& ", " & ");
-				temResult[2] = temResult[2].replaceAll("\\s+&\\s+", " & ");
-				// System.out.println(temResult[2]);
-				if (segmenter[3].equals(tem[3])) {
+				temResult[2] = temResult[2].replaceAll("\\s*&\\s*", " & ");
+				// if two terms have different annotations, this would cause
+				// problem
+				if (segmenter[3].equals(newStr[3])) {
 					// System.out.println("i am here");
-					temResult[3] = tem[3];
+					temResult[3] = newStr[3];
 					addUp = temResult[0] + "\t" + temResult[1] + "\t" + temResult[2] + "\t" + temResult[3];
-					// System.out.println(
-					// temResult[0] + "\t" + temResult[1] + "\t" + temResult[2]
-					// + "\t" + temResult[3] + "\n");
-
 				} else {
 					System.out.println("Two different annotations in one terms");
 					countResult++;
@@ -138,19 +119,11 @@ public class Comparison {
 					start();
 
 				}
-				// System.out.println("help me");
-				// System.out.println(addUp);
-				// System.out.println(result.size());
 				compare(tester, addUp);
 			}
-			// System.out.println("abc");
-
 		} else {
-			// System.out.println("what is going on");
 			countResult++;
 			start();
-
-			// System.out.println(tester);
 		}
 
 	}
