@@ -10,9 +10,11 @@ public class Comparison {
 	private String resultPath;
 	private ArrayList<String> test = new ArrayList<String>();
 	private ArrayList<String> result = new ArrayList<String>();
-	int countTest = 0;
-	int countResult = 0;
-	private int checking = 0;
+	private int countTest = 0;
+	private int countResult = 0;
+	private int truePositive = 0;
+	private int falseNegative = 0;
+	private int numberOfAnnotation = 0;
 
 	public Comparison(String test, String result) {
 		resultPath = result;
@@ -38,8 +40,19 @@ public class Comparison {
 			}
 		} finally {
 			brT.close();
+			brR.close();
+			falsePositive();
 			start();
-
+			int falsePositive = numberOfAnnotation - truePositive;
+			double precision = (truePositive / ((double) truePositive + (double) (numberOfAnnotation - truePositive)));
+			double recall = (truePositive / ((double) truePositive + (double) falseNegative));
+			System.out.println("True Positive: " + truePositive);
+			System.out.println("False Negative: " + falseNegative);
+			System.out.println("False Positive " + falsePositive);
+			System.out.println("The number of Annotations: " + numberOfAnnotation);
+			System.out.println("Precision: " + precision);
+			System.out.println("Recall: " + recall);
+			System.out.println("F-Measure: " + ((2 * precision * recall) / (precision + recall)));
 			System.out.println(test.size());
 			System.out.println(result.size());
 		}
@@ -47,55 +60,81 @@ public class Comparison {
 
 	public void start() throws IOException {
 		if (countTest < test.size() && countResult < result.size()) {
-			checking = 0;
 			String input = test.get(countTest);
 			String insert = result.get(countResult);
 			compare(input, insert);
+
 		}
 	}
 
+	public void falsePositive() throws IOException {
+
+		for (String check : result) {
+			System.out.println(check);
+			if (check.contains("B-taxon") || check.contains("B-habitat") || check.contains("B-anatomicalEntity"))
+				numberOfAnnotation++;
+
+		}
+
+	}
+
 	public void compare(String tester, String comparer) throws IOException {
-		// System.out.println(tester);
-		// System.out.println(comparer);
+		// word pre-processing (format)
 		String[] spilter = tester.split("\t");
 		String temName = "B-" + spilter[3].toUpperCase();
 		String[] segmenter = comparer.split("\t");
 		spilter[2] = spilter[2].replaceAll("\\s+", " ");
-		spilter[2] = spilter[2].replaceAll("－ ", "－");
-		// Compare the beginning number
+		spilter[2] = spilter[2].replaceAll("\\s*－\\s*", "－");
+
+		// Compare the beginning index
 		if (spilter[0].equals(segmenter[0])) {
-			// Compare the ending number
+
+			// Compare the ending index
 			if (spilter[1].equals(segmenter[1])) {
+
 				// Compare the terms
 				if (spilter[2].equals(segmenter[2])) {
 					System.out.print("Test file is : " + spilter[3].toUpperCase());
 					System.out.print(";\tResult file is : " + segmenter[3].toUpperCase());
+
 					// Compare the annotation
 					if (temName.equals(segmenter[3].toUpperCase())) {
-						System.out.println(";\tTherefore, They match: " + segmenter[2]);
+						System.out.println(";\tThey match: " + segmenter[2] + "\n");
+						// Calculating the True Positive
+						if (temName.equalsIgnoreCase("B-anatomicalEntity") || temName.equalsIgnoreCase("B-taxon")
+								|| temName.equalsIgnoreCase("B-habitat"))
+							truePositive++;
 					} else {
-						System.out.println(";\tTherefore, They do not match each other: " + segmenter[2]);
+						System.out.println(";\tTherefore, They don't match each other: " + segmenter[2] + "\n");
+						if (temName.equalsIgnoreCase("B-anatomicalEntity") || temName.equalsIgnoreCase("B-taxon")
+								|| temName.equalsIgnoreCase("B-habitat"))
+							falseNegative++;
 					}
 					countTest++;
 					countResult++;
 					start();
 
 				} else {
-					// compare the terms
+					// The terms are different from golden standard
 					countTest++;
 					countResult++;
-					System.out.println(countResult + "Citation can not be detected!");
+					System.out.println("Citation can not be detected: " + segmenter[2] + "\n");
 					start();
 				}
 			} else {
-				// compare the ending of the term
+
+				// There are more than one words that making up a term
 				String addUp = "";
 				String[] temResult = new String[4];
 				temResult[0] = spilter[0];
+
+				// get the new entity from the resultText and make up a new term
 				countResult++;
 				String newSen = result.get(countResult);
 				String[] newStr = newSen.split("\t");
 				temResult[1] = newStr[1];
+
+				// remove all the duplicate punctuation
 				if (newStr[2].matches(".*\\p{Punct}")) {
 					newStr[2] = newStr[2];
 					newStr[3] = segmenter[3];
@@ -103,21 +142,29 @@ public class Comparison {
 					newStr[2] = " " + newStr[2];
 				}
 
+				// pre-processing
 				temResult[2] = segmenter[2] + newStr[2];
-				temResult[2] = temResult[2].replaceAll("- ", "-");
+				temResult[2] = temResult[2].replaceAll("\\s+", " ");
+				temResult[2] = temResult[2].replaceAll("\\s*-\\s*", "-");
 				temResult[2] = temResult[2].replaceAll("\\s*&\\s*", " & ");
-				// if two terms have different annotations, this would cause
-				// problem
+
+				// two terms with different annotations would cause problem
 				if (segmenter[3].equals(newStr[3])) {
-					// System.out.println("i am here");
+
 					temResult[3] = newStr[3];
 					addUp = temResult[0] + "\t" + temResult[1] + "\t" + temResult[2] + "\t" + temResult[3];
+
+					// Not the end of the loop, so there is no need to add TP/FN
 				} else {
-					System.out.println("Two different annotations in one terms");
+					System.out.println("Two different annotations in one terms: " + segmenter[2] + newStr[2] + "\n");
 					countResult++;
 					countTest++;
 					start();
 
+					// calculating the false negative
+					if (newStr[3].equalsIgnoreCase("B-anatomicalEntity") || newStr[3].equalsIgnoreCase("B-taxon")
+							|| newStr[3].equalsIgnoreCase("B-habitat"))
+						falseNegative++;
 				}
 				compare(tester, addUp);
 			}
