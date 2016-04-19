@@ -1,6 +1,6 @@
 # NERsuite-result-and-TSV-Comparison
 This program is used to measure the true positive, false positive and false negative by comparing the results of NERsuite (A Named Entity Recognition toolkit) and XMI gold standard.  The input format for both files must look like the following:
-"beginningIndex<tab>endingIndex<tab>terms<tab>annotation".  For example, "0 8 STANDLEY  Person".  Each line can only contain one record.
+"beginningIndex<\tab>endingIndex<\tab>terms<\tab>annotation".  For example, "0 8 STANDLEY  Person".  Each line can only contain one record.
 
 PS. I have another program that used to formalise the format of the result.
 
