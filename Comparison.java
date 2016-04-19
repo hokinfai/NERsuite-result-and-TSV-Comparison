@@ -52,10 +52,10 @@ public class Comparison {
 			int falsePositive = numberOfAnnotation - truePositive;
 			double precision = (truePositive / ((double) truePositive + (double) (numberOfAnnotation - truePositive)));
 			double recall = (truePositive / ((double) truePositive + (double) falseNegative));
-			System.out.println("True Positive: " + truePositive);
-			System.out.println("False Negative: " + falseNegative);
-			System.out.println("False Positive " + falsePositive);
 			System.out.println("The number of Annotations: " + numberOfAnnotation);
+			System.out.println("True Positive: " + truePositive);
+			System.out.println("False Positive " + falsePositive);
+			System.out.println("False Negative: " + falseNegative);
 			System.out.println("Precision: " + precision);
 			System.out.println("Recall: " + recall);
 			System.out.println("F-Measure: " + ((2 * precision * recall) / (precision + recall)));
@@ -71,15 +71,16 @@ public class Comparison {
 		if (countTest < test.size() && countResult < result.size()) {
 			String[] nerSep = result.get(countResult).split("\t");
 			String[] goldSep = test.get(countTest).split("\t");
-			System.out.println("initial checking" + test.get(countTest));
+			// System.out.println("initial checking" + test.get(countTest));
 			goldSep[2] = goldSep[2].replaceAll("\\s+", " ").trim();
 			int goldBegin = Integer.parseInt(goldSep[0]);
 
 			if (!goldSep[3].equalsIgnoreCase("citation")) {
-				System.out.println(goldSep[2].trim() + " and " + nerSep[2].trim());
+				// System.out.println(goldSep[2].trim() + " and " +
+				// nerSep[2].trim());
 				if (goldSep[2].trim().startsWith(nerSep[2].trim())) {
 					nerBegin = Integer.parseInt(nerSep[0]);
-					System.out.println("initial checking" + nerBegin);
+					// System.out.println("initial checking" + nerBegin);
 				}
 
 				if (goldSep[2].contains(nerSep[2]) && (nerBegin - goldBegin) <= 40 && (goldBegin - nerBegin) <= 40) {
@@ -90,7 +91,8 @@ public class Comparison {
 
 					}
 					formatedIndex[0] = "" + nerBegin + "";
-					System.out.println("initial checking" + formatedIndex[0]);
+					// System.out.println("initial checking" +
+					// formatedIndex[0]);
 					formatedIndex[2] = goldSep[2];
 					formatedIndex[3] = goldSep[3];
 					// this is a sentence
@@ -98,7 +100,7 @@ public class Comparison {
 							|| goldSep[2].contains("&")) {
 
 						if (goldSep[2].trim().endsWith(nerSep[2].trim())) {
-							System.out.println("sentence checking");
+							// System.out.println("sentence checking");
 							formatedIndex[1] = nerSep[1];
 
 							String element = formatedIndex[0] + "\t" + formatedIndex[1] + "\t" + formatedIndex[2] + "\t"
@@ -149,12 +151,12 @@ public class Comparison {
 								String[] verifyDouble = test.get(countTest + 1).split("\t");
 
 								if (!goldSep[0].equals(verifyDouble[0]) && !goldSep[1].equals(verifyDouble[1])) {
-									System.out.println("single checking");
-									System.out.println(test.get(countTest));
+									// System.out.println("single checking");
+									// System.out.println(test.get(countTest));
 									countTest++;
-									System.out.println(test.get(countTest));
+									// System.out.println(test.get(countTest));
 									countResult++;
-									System.out.println();
+									// System.out.println();
 									indexMatch();
 								} else {
 
@@ -179,7 +181,7 @@ public class Comparison {
 			} else {
 				System.out.println("it is citation");
 				countTest++;
-				System.out.println(test.get(countTest));
+				// System.out.println(test.get(countTest));
 				indexMatch();
 			}
 		}
