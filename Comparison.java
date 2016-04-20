@@ -244,6 +244,7 @@ public class Comparison {
 								|| temName.equalsIgnoreCase("B-habitat")) {
 							truePositive++;
 						} else {
+
 							countTest++;
 							start();
 						}
@@ -252,6 +253,7 @@ public class Comparison {
 						System.out.println(";\tTherefore, They don't match each other: " + segmenter[2] + "\n");
 						if (temName.equalsIgnoreCase("B-anatomicalEntity") || temName.equalsIgnoreCase("B-taxon")
 								|| temName.equalsIgnoreCase("B-habitat"))
+
 							falseNegative++;
 
 					}
@@ -348,8 +350,10 @@ public class Comparison {
 					}
 					// calculating the false negative
 					if (newStr[3].equalsIgnoreCase("B-anatomicalEntity") || newStr[3].equalsIgnoreCase("B-taxon")
-							|| newStr[3].equalsIgnoreCase("B-habitat"))
+							|| newStr[3].equalsIgnoreCase("B-habitat")) {
+
 						falseNegative++;
+					}
 				}
 				compare(tester, addUp);
 			}
@@ -362,7 +366,7 @@ public class Comparison {
 
 	public static void main(String args[]) throws IOException {
 		String path = "/Users/AlanHo/Documents/DissertationLibrary/Programming testing/";
-		new Comparison(path + "Pair3.tsv", path + "Pair3.txt").readFile();
+		new Comparison(path + "Pair1.tsv", path + "Pair1.txt").readFile();
 
 	}
 }
